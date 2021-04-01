@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ListView
 import android.widget.Toast
 import com.google.firebase.database.*
 
@@ -13,6 +14,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var etNama : EditText
     private lateinit var etAlamat : EditText
     private lateinit var btnSave : Button
+    private lateinit var ref : DatabaseReference
+    private lateinit var mhsList : MutableList<Mahasiswa>
+    private lateinit var listMhs : ListView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,6 +27,33 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         btnSave = findViewById(R.id.btn_save)
 
         btnSave.setOnClickListener(this)
+
+        mhsList = mutableListOf()
+
+        ref = FirebaseDatabase.getInstance().getReference("mahasiswa")
+
+        listMhs = findViewById(R.id.lv_mhs)
+
+        ref.addValueEventListener(object : ValueEventListener{
+            override fun onCancelled(error: DatabaseError) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onDataChange(p0: DataSnapshot) {
+                if(p0.exists()){
+                    for(h in p0.children){
+                        val mahasiswa = h.getValue(Mahasiswa::class.java)
+                        if (mahasiswa != null) {
+                            mhsList.add(mahasiswa)
+                        }
+                    }
+
+                    val adapter = MahasiswaAdapter(applicationContext, R.layout.item_mhs, mhsList)
+                    listMhs.adapter = adapter
+                }
+            }
+
+        })
     }
 
     override fun onClick(v: View?) {
@@ -42,8 +73,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             etAlamat.error = "Isi Alamat!"
             return
         }
-
-        val ref = FirebaseDatabase.getInstance().getReference("mahasiswa")
 
         val mhsId = ref.push().key
 
