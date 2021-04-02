@@ -48,7 +48,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                         }
                     }
 
-                    val adapter = MahasiswaAdapter(applicationContext, R.layout.item_mhs, mhsList)
+                    val adapter = MahasiswaAdapter(this@MainActivity, R.layout.item_mhs, mhsList)
                     listMhs.adapter = adapter
                 }
             }
@@ -76,7 +76,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
         val mhsId = ref.push().key
 
-        val mhs = Mahasiswa(mhsId, nama, alamat)
+        val mhs = Mahasiswa(mhsId!!, nama, alamat)
 
         if (mhsId != null) {
             ref.child(mhsId).setValue(mhs).addOnCompleteListener{
